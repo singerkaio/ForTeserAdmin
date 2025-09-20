@@ -1,0 +1,256 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+-- GUI (không reset khi respawn)
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ToolScalerGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Container chính
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 340, 0, 150)
+mainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.Active = true
+mainFrame.Parent = screenGui
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+
+-- Thanh tiêu đề (kéo GUI)
+local guiTitle = Instance.new("TextButton")
+guiTitle.Size = UDim2.new(1, 0, 0, 30)
+guiTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+guiTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+guiTitle.TextScaled = true
+guiTitle.Text = "TthanhPvP🤓"
+guiTitle.AutoButtonColor = false
+guiTitle.Parent = mainFrame
+Instance.new("UICorner", guiTitle).CornerRadius = UDim.new(0, 8)
+
+-- Nút thu nhỏ
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+minimizeBtn.Position = UDim2.new(1, -35, 0, 0)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.Text = "-"
+minimizeBtn.TextScaled = true
+minimizeBtn.Parent = guiTitle
+Instance.new("UICorner", minimizeBtn).CornerRadius = UDim.new(0, 6)
+
+-- Ô vuông nhỏ khi thu gọn
+local miniFrame = Instance.new("TextButton")
+miniFrame.Size = UDim2.new(0, 60, 0, 60)
+miniFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+miniFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+miniFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
+miniFrame.Text = "Tthanh"
+miniFrame.TextScaled = true
+miniFrame.Visible = false
+miniFrame.Active = true
+miniFrame.Parent = screenGui
+Instance.new("UICorner", miniFrame).CornerRadius = UDim.new(0, 12)
+
+-- Label hiển thị tool
+local toolLabel = Instance.new("TextLabel")
+toolLabel.Size = UDim2.new(0, 250, 0, 30)
+toolLabel.Position = UDim2.new(0, 10, 0, 40)
+toolLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+toolLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+toolLabel.TextScaled = true
+toolLabel.Text = "Vật Phẩm : Không Thấy"
+toolLabel.Parent = mainFrame
+Instance.new("UICorner", toolLabel).CornerRadius = UDim.new(0, 10)
+
+-- Slider background
+local sliderBg = Instance.new("Frame")
+sliderBg.Size = UDim2.new(0, 220, 0, 20)
+sliderBg.Position = UDim2.new(0, 10, 0, 80)
+sliderBg.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+sliderBg.Active = true
+sliderBg.Parent = mainFrame
+Instance.new("UICorner", sliderBg).CornerRadius = UDim.new(0, 10)
+
+-- Slider button
+local sliderBtn = Instance.new("TextButton")
+sliderBtn.Size = UDim2.new(0, 20, 0, 20)
+sliderBtn.Position = UDim2.new(0, 0, 0, 0)
+sliderBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+sliderBtn.Text = ""
+sliderBtn.AutoButtonColor = false
+sliderBtn.Active = true
+sliderBtn.Parent = sliderBg
+Instance.new("UICorner", sliderBtn).CornerRadius = UDim.new(1, 0)
+
+-- Label hiển thị giá trị scale
+local valueLabel = Instance.new("TextLabel")
+valueLabel.Size = UDim2.new(0, 80, 0, 30)
+valueLabel.Position = UDim2.new(0, 240, 0, 75)
+valueLabel.BackgroundTransparency = 1
+valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+valueLabel.TextScaled = true
+valueLabel.Text = "Phóng To : 1"
+valueLabel.Parent = mainFrame
+
+-- ==== DRAG GUI ====
+local draggingGui = false
+local dragOffset = Vector2.new()
+
+guiTitle.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingGui = true
+		dragOffset = input.Position - mainFrame.AbsolutePosition
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingGui = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if draggingGui and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		mainFrame.Position = UDim2.new(0, input.Position.X - dragOffset.X, 0, input.Position.Y - dragOffset.Y)
+	end
+end)
+
+-- ==== DRAG MINI ====
+local draggingMini = false
+local miniOffset = Vector2.new()
+
+miniFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingMini = true
+		miniOffset = input.Position - miniFrame.AbsolutePosition
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingMini = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if draggingMini and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		miniFrame.Position = UDim2.new(0, input.Position.X - miniOffset.X, 0, input.Position.Y - miniOffset.Y)
+	end
+end)
+
+-- ==== THU NHỎ GUI ====
+local isMinimized = false
+local function toggleMinimize()
+	if isMinimized then
+		-- mở lại GUI
+		miniFrame.Visible = false
+		mainFrame.Visible = true
+		isMinimized = false
+	else
+		-- thu nhỏ GUI
+		miniFrame.Position = mainFrame.Position
+		miniFrame.Visible = true
+		mainFrame.Visible = false
+		isMinimized = true
+	end
+end
+
+minimizeBtn.MouseButton1Click:Connect(toggleMinimize)
+miniFrame.MouseButton1Click:Connect(toggleMinimize)
+
+-- ==== SLIDER LOGIC ====
+local draggingSlider = false
+local currentScale = 1
+local equippedHandle = nil
+
+local function getHandle(tool)
+	for _, v in ipairs(tool:GetDescendants()) do
+		if v:IsA("BasePart") and v.Name:lower():match("handle") then
+			return v
+		end
+	end
+	for _, v in ipairs(tool:GetDescendants()) do
+		if v:IsA("BasePart") then
+			return v
+		end
+	end
+	return nil
+end
+
+local function scaleHandle(handle, scale)
+	local mesh = handle:FindFirstChildWhichIsA("SpecialMesh")
+	if mesh then
+		mesh.Scale = Vector3.new(scale, scale, scale)
+	else
+		handle.Size = Vector3.new(1,1,1) * scale * 2
+	end
+end
+
+local function updateSlider(x)
+	local relativeX = math.clamp((x - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
+	sliderBtn.Position = UDim2.new(relativeX, -sliderBtn.Size.X.Offset/2, 0, 0)
+	currentScale = math.floor(relativeX * 9 + 1)
+	valueLabel.Text = "Phóng To: " .. currentScale
+
+	if equippedHandle then
+		scaleHandle(equippedHandle, currentScale)
+	end
+end
+
+sliderBtn.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingSlider = true
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingSlider = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		updateSlider(input.Position.X)
+	end
+end)
+
+-- ==== TOOL EQUIP LISTENER ====
+local function listenTools(char)
+	local function connectTool(tool)
+		if not tool:IsA("Tool") then return end
+
+		tool.Equipped:Connect(function()
+			toolLabel.Text = "Vật Phẩm: " .. tool.Name
+			equippedHandle = getHandle(tool)
+			if equippedHandle then
+				scaleHandle(equippedHandle, currentScale)
+			end
+		end)
+
+		tool.Unequipped:Connect(function()
+			toolLabel.Text = "Phóng To Vật Phẩm"
+			equippedHandle = nil
+		end)
+	end
+
+	player.Backpack.ChildAdded:Connect(connectTool)
+	char.ChildAdded:Connect(connectTool)
+
+	for _, tool in ipairs(player.Backpack:GetChildren()) do
+		connectTool(tool)
+	end
+	for _, tool in ipairs(char:GetChildren()) do
+		connectTool(tool)
+	end
+end
+
+player.CharacterAdded:Connect(function(char)
+	listenTools(char)
+end)
+
+if player.Character then
+	listenTools(player.Character)
+end
